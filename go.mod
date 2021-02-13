@@ -1,3 +1,3 @@
-module github.com/near/borsh-go
+module github.com/mikroskeem/borsh-go
 
 go 1.15
