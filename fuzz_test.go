@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/near/borsh-go"
+	"github.com/eteu-technologies/borsh-go"
 )
 
 func TestFuzz(t *testing.T) {

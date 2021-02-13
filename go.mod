@@ -1,3 +1,3 @@
-module github.com/mikroskeem/borsh-go
+module github.com/eteu-technologies/borsh-go
 
 go 1.15
