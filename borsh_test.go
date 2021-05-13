@@ -6,6 +6,8 @@ import (
 	"reflect"
 	strings2 "strings"
 	"testing"
+
+	"lukechampine.com/uint128"
 )
 
 type A struct {
@@ -347,13 +349,13 @@ func TestSlices(t *testing.T) {
 
 func TestUint128(t *testing.T) {
 	tests := []struct {
-		in big.Int
+		in uint128.Uint128
 	}{
-		{*big.NewInt(23)},
-		{*big.NewInt(math.MaxInt16)},
-		{*big.NewInt(math.MaxInt32)},
-		{*big.NewInt(math.MaxInt64)},
-		{*big.NewInt(0).Mul(big.NewInt(math.MaxInt64), big.NewInt(math.MaxInt64))},
+		{uint128.FromBig(big.NewInt(23))},
+		{uint128.FromBig(big.NewInt(math.MaxInt16))},
+		{uint128.FromBig(big.NewInt(math.MaxInt32))},
+		{uint128.FromBig(big.NewInt(math.MaxInt64))},
+		{uint128.FromBig(big.NewInt(0).Mul(big.NewInt(math.MaxInt64), big.NewInt(math.MaxInt64)))},
 	}
 
 	for _, tt := range tests {

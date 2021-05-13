@@ -9,6 +9,8 @@ import (
 	"math/big"
 	"reflect"
 	"sort"
+
+	"lukechampine.com/uint128"
 )
 
 // Deserialize `data` according to the schema of `s`, and store the value into it. `s` must be a pointer type variable
@@ -218,7 +220,7 @@ func deserialize(t reflect.Type, r io.Reader) (interface{}, error) {
 			return p.Interface(), nil
 		}
 	case reflect.Struct:
-		if t == reflect.TypeOf(*big.NewInt(0)) {
+		if t == reflect.TypeOf(uint128.Max) {
 			s, err := deserializeUint128(t, r)
 			if err != nil {
 				return nil, err
@@ -294,12 +296,8 @@ func deserializeUint128(t reflect.Type, r io.Reader) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	// make it big-endian
-	for i, j := 0, 15; i < j; i, j = i+1, j-1 {
-		d[i], d[j] = d[j], d[i]
-	}
-	var u big.Int
-	u.SetBytes(d[:])
+
+	u := uint128.FromBytes(d[:])
 	return u, nil
 }
 
@@ -359,18 +357,9 @@ func serializeStruct(v reflect.Value, b io.Writer) error {
 }
 
 func serializeUint128(v reflect.Value, b io.Writer) error {
-	u := v.Interface().(big.Int)
-	buf := u.Bytes()
-	if len(buf) > 16 {
-		return errors.New("big.Int too large for u128")
-	}
-	// fill big-endian buffer
+	u := v.Interface().(uint128.Uint128)
 	var d [16]byte
-	copy(d[16-len(buf):], buf)
-	// make it little-endian
-	for i, j := 0, 15; i < j; i, j = i+1, j-1 {
-		d[i], d[j] = d[j], d[i]
-	}
+	u.PutBytes(d[:])
 	_, err := b.Write(d[:])
 	return err
 }
