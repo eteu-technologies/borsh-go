@@ -13,17 +13,9 @@ import (
 	"lukechampine.com/uint128"
 )
 
-type BorshUnmarshalable interface {
-	UnmarshalBorsh([]byte) error
-}
-
 // Deserialize `data` according to the schema of `s`, and store the value into it. `s` must be a pointer type variable
 // that points to the original schema of `data`.
 func Deserialize(s interface{}, data []byte) error {
-	if bm, ok := s.(BorshUnmarshalable); ok {
-		return bm.UnmarshalBorsh(data)
-	}
-
 	reader := bytes.NewReader(data)
 	v := reflect.ValueOf(s)
 	if v.Kind() != reflect.Ptr {
@@ -50,6 +42,16 @@ func read(r io.Reader, n int) ([]byte, error) {
 }
 
 func deserialize(t reflect.Type, r io.Reader) (interface{}, error) {
+	if reflect.PtrTo(t).Implements(unmarshalableType) {
+		m := reflect.New(t)
+		val := m.Interface()
+		err := val.(BorshUnmarshalable).UnmarshalBorsh(r)
+		if err != nil {
+			return nil, err
+		}
+		return val, err
+	}
+
 	if t.Kind() == reflect.Uint8 {
 		tmp, err := read(r, 1)
 		if err != nil {
@@ -313,14 +315,19 @@ type BorshMarshalable interface {
 	MarshalBorsh() ([]byte, error)
 }
 
+type BorshUnmarshalable interface {
+	UnmarshalBorsh(io.Reader) error
+}
+
+var (
+	marshalableType   = reflect.TypeOf((*BorshMarshalable)(nil)).Elem()
+	unmarshalableType = reflect.TypeOf((*BorshUnmarshalable)(nil)).Elem()
+)
+
 // Serialize `s` into bytes according to Borsh's specification(https://borsh.io/).
 //
 // The type mapping can be found at https://github.com/near/borsh-go.
 func Serialize(s interface{}) ([]byte, error) {
-	if bm, ok := s.(BorshMarshalable); ok {
-		return bm.MarshalBorsh()
-	}
-
 	result := new(bytes.Buffer)
 
 	err := serialize(reflect.ValueOf(s), result)
@@ -382,6 +389,18 @@ func serializeUint128(v reflect.Value, b io.Writer) error {
 
 func serialize(v reflect.Value, b io.Writer) error {
 	var err error
+
+	if v.Type().Implements(marshalableType) {
+		m := v.Interface().(BorshMarshalable)
+		bs, err := m.MarshalBorsh()
+		if err != nil {
+			return err
+		}
+
+		_, err = b.Write(bs)
+		return err
+	}
+
 	switch v.Kind() {
 	case reflect.Int8:
 		_, err = b.Write([]byte{byte((v.Interface().(int8)))})
