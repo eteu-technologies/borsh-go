@@ -311,6 +311,9 @@ func deserializeUint128(t reflect.Type, r io.Reader) (interface{}, error) {
 	return u, nil
 }
 
+// TODO: implement marshaler/unmarshaler context (needs reworking this library quite a bit sadly)
+//       that way users will be able to decode data more flexibly, unlike with this crap interface.
+
 type BorshMarshalable interface {
 	MarshalBorsh() ([]byte, error)
 }
