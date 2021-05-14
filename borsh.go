@@ -13,9 +13,17 @@ import (
 	"lukechampine.com/uint128"
 )
 
+type BorshUnmarshalable interface {
+	UnmarshalBorsh([]byte) error
+}
+
 // Deserialize `data` according to the schema of `s`, and store the value into it. `s` must be a pointer type variable
 // that points to the original schema of `data`.
 func Deserialize(s interface{}, data []byte) error {
+	if bm, ok := s.(BorshUnmarshalable); ok {
+		return bm.UnmarshalBorsh(data)
+	}
+
 	reader := bytes.NewReader(data)
 	v := reflect.ValueOf(s)
 	if v.Kind() != reflect.Ptr {
@@ -301,10 +309,18 @@ func deserializeUint128(t reflect.Type, r io.Reader) (interface{}, error) {
 	return u, nil
 }
 
+type BorshMarshalable interface {
+	MarshalBorsh() ([]byte, error)
+}
+
 // Serialize `s` into bytes according to Borsh's specification(https://borsh.io/).
 //
 // The type mapping can be found at https://github.com/near/borsh-go.
 func Serialize(s interface{}) ([]byte, error) {
+	if bm, ok := s.(BorshMarshalable); ok {
+		return bm.MarshalBorsh()
+	}
+
 	result := new(bytes.Buffer)
 
 	err := serialize(reflect.ValueOf(s), result)
