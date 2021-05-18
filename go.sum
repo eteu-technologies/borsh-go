@@ -1,2 +1,2 @@
-lukechampine.com/uint128 v1.1.1 h1:pnxCASz787iMf+02ssImqk6OLt+Z5QHMoZyUXR4z6JU=
-lukechampine.com/uint128 v1.1.1/go.mod h1:c4eWIwlEGaxC/+H1VguhU4PHXNWDCDMUlWdIWl2j1gk=
+github.com/eteu-technologies/golang-uint128 v1.1.1-eteu h1:lA+vd23IUFb/cakdwdoG0XKDhpfBBZ6a7Pq3MS24KT8=
+github.com/eteu-technologies/golang-uint128 v1.1.1-eteu/go.mod h1:5Vr5yDsJV9eBl44ziSgt1xDZbVfJv4+IpqnUf0wa8t4=
