@@ -7,7 +7,7 @@ import (
 	strings2 "strings"
 	"testing"
 
-	"lukechampine.com/uint128"
+	"github.com/eteu-technologies/golang-uint128"
 )
 
 type A struct {

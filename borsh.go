@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sort"
 
-	"lukechampine.com/uint128"
+	"github.com/eteu-technologies/golang-uint128"
 )
 
 // Deserialize `data` according to the schema of `s`, and store the value into it. `s` must be a pointer type variable
